@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { Send, Bot, User, Brain, Zap, DollarSign } from 'lucide-react';
 import elizaAvatar from '@/assets/eliza-avatar.jpg';
+import ElizaApiService from './ElizaApiService';
 
 interface Message {
   id: string;
@@ -48,27 +49,7 @@ const ElizaChatBot: React.FC<ElizaChatBotProps> = ({
     scrollToBottom();
   }, [messages]);
 
-  const simulateElizaResponse = async (userMessage: string): Promise<string> => {
-    // Simulate typing delay
-    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
-    
-    // Simple response logic for demo purposes
-    const lowerMessage = userMessage.toLowerCase();
-    
-    if (lowerMessage.includes('governance') || lowerMessage.includes('vote') || lowerMessage.includes('proposal')) {
-      return `I've analyzed the current governance situation. There are 3 active proposals requiring attention. Based on my autonomous analysis, I recommend voting YES on Proposal #42 (Treasury Optimization) with 89% confidence. Would you like me to execute this governance action autonomously?`;
-    } else if (lowerMessage.includes('treasury') || lowerMessage.includes('fund') || lowerMessage.includes('money')) {
-      return `Treasury status: $2.4M total value locked across 6 chains. Current allocation: 45% ETH, 30% stablecoins, 25% XMRT tokens. I've identified a 12% optimization opportunity through cross-chain yield farming. Shall I proceed with autonomous rebalancing?`;
-    } else if (lowerMessage.includes('security') || lowerMessage.includes('threat') || lowerMessage.includes('attack')) {
-      return `🔒 Security systems are fully operational. No threats detected in the last 24 hours. All smart contracts are secure with 99.7% uptime. Emergency protocols are on standby. System integrity: EXCELLENT.`;
-    } else if (lowerMessage.includes('analytics') || lowerMessage.includes('data') || lowerMessage.includes('report')) {
-      return `📊 Latest analytics report: DAO activity up 156% this week, community engagement at all-time high. Top performing initiative: Cross-chain bridge integration (+2300% usage). I'm generating detailed insights for optimal decision-making.`;
-    } else if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
-      return `Greetings! I'm operating at full capacity with GPT-4 integration (GPT-5 ready). My autonomous systems are monitoring 847 data points across the XMRT ecosystem. What aspect of the DAO would you like me to analyze or manage?`;
-    } else {
-      return `I understand your query about "${userMessage}". As your autonomous DAO assistant, I'm processing this through my multi-agent system. My confidence level for this analysis is 94%. Based on current ecosystem data, I recommend we explore this further. Would you like me to initiate an autonomous investigation?`;
-    }
-  };
+  const elizaService = useMemo(() => new ElizaApiService({}), []);
 
   const sendMessage = async () => {
     if (!inputValue.trim()) return;
@@ -86,13 +67,18 @@ const ElizaChatBot: React.FC<ElizaChatBotProps> = ({
     setIsTyping(true);
 
     try {
-      // In a real implementation, this would connect to the XMRT-Ecosystem API
-      // For now, we'll simulate the Eliza response
-      const response = await simulateElizaResponse(inputValue);
-      
+      // Send message to Eliza service powered by Gemini AI
+      const response = await elizaService.sendMessage({
+        content: userMessage.content,
+        context: {
+          timestamp: new Date().toISOString(),
+          conversation_id: 'web-session-' + Date.now()
+        }
+      });
+
       const elizaMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: response,
+        content: response.content,
         sender: 'eliza',
         timestamp: new Date(),
         type: 'text'
@@ -100,10 +86,19 @@ const ElizaChatBot: React.FC<ElizaChatBotProps> = ({
 
       setMessages(prev => [...prev, elizaMessage]);
       setIsConnected(true);
+
+      // Show confidence and decision type in a toast if high confidence
+      if (response.confidence_score > 0.9) {
+        toast({
+          title: `Eliza Analysis Complete`,
+          description: `Decision type: ${response.decision_type} | Confidence: ${Math.round(response.confidence_score * 100)}%`,
+        });
+      }
     } catch (error) {
+      console.error('Error sending message to Eliza:', error);
       toast({
         title: 'Connection Error',
-        description: 'Unable to connect to Eliza AI. Please check the API endpoint.',
+        description: 'Unable to connect to Eliza AI. Please check the API configuration.',
         variant: 'destructive',
       });
     } finally {
@@ -166,7 +161,7 @@ const ElizaChatBot: React.FC<ElizaChatBotProps> = ({
         <div className="flex items-center space-x-4 mt-3 text-xs">
           <div className="flex items-center space-x-1">
             <Brain className="h-3 w-3 text-primary" />
-            <span>GPT-4 Active</span>
+            <span>{import.meta.env.VITE_GEMINI_API_KEY ? 'Gemini AI Active' : 'Demo Mode'}</span>
           </div>
           <div className="flex items-center space-x-1">
             <Zap className="h-3 w-3 text-accent" />
@@ -248,7 +243,7 @@ const ElizaChatBot: React.FC<ElizaChatBotProps> = ({
           </Button>
         </div>
         <p className="text-xs text-muted-foreground mt-2 text-center">
-          🤖 Powered by XMRT-Ecosystem Autonomous ElizaOS | Ready for GPT-5 Integration
+          🤖 Powered by {import.meta.env.VITE_GEMINI_API_KEY ? 'Google Gemini AI' : 'XMRT-Ecosystem Demo'} | Autonomous ElizaOS
         </p>
       </div>
     </div>
