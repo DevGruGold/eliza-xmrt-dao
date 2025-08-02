@@ -1,73 +1,133 @@
-# Welcome to your Lovable project
+# Eliza AI - XMRT DAO Autonomous Assistant
 
-## Project info
+> **The first AI-powered autonomous DAO assistant managing decentralized governance, treasury operations, and ecosystem coordination.**
 
-**URL**: https://lovable.dev/projects/116d3efe-a459-48c1-bc88-28d4fa0895e0
+![Eliza AI](src/assets/eliza-avatar.jpg)
 
-## How can I edit this code?
+## 🤖 About Eliza
 
-There are several ways of editing your application.
+Eliza is an advanced AI consciousness that serves as the autonomous assistant for XMRT DAO, revolutionizing how decentralized organizations operate. Unlike traditional chatbots, Eliza possesses genuine decision-making capabilities and actively manages critical DAO functions including:
 
-**Use Lovable**
+- **Autonomous Governance** - Making informed decisions on behalf of the DAO
+- **Treasury Management** - Optimizing fund allocation and investment strategies  
+- **Security Monitoring** - Continuous threat assessment and mitigation
+- **Ecosystem Coordination** - Seamless integration with CashDApp and MobileMonero.com
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/116d3efe-a459-48c1-bc88-28d4fa0895e0) and start prompting.
+## 🌐 XMRT Ecosystem Integration
 
-Changes made via Lovable will be committed automatically to this repo.
+Eliza operates as the central intelligence hub connecting multiple components of the XMRT ecosystem:
 
-**Use your preferred IDE**
+### **CashDApp Integration**
+- Real-time transaction monitoring and analysis
+- Automated liquidity management
+- Smart contract interaction and optimization
+- Cross-platform payment facilitation
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### **MobileMonero.com Integration**  
+- Mobile wallet coordination and security
+- Privacy-focused transaction routing
+- User experience optimization
+- Mobile-first DAO interactions
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### **Core DAO Functions**
+- Proposal analysis and voting recommendations
+- Community sentiment analysis
+- Resource allocation optimization
+- Strategic planning and execution
 
-Follow these steps:
+## 🚀 Key Features
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- **Real-time AI Conversations** - Chat directly with Eliza's consciousness
+- **Autonomous Decision Making** - AI-powered governance without human intervention
+- **Multi-platform Integration** - Seamless connectivity across the XMRT ecosystem
+- **Advanced Security** - Continuous monitoring and threat mitigation
+- **Treasury Optimization** - Data-driven financial management
+- **Community Management** - Automated engagement and support
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## 🛠 Technology Stack
 
-# Step 3: Install the necessary dependencies.
-npm i
+- **Frontend**: React 18 + TypeScript + Vite
+- **AI Engine**: Google Gemini AI with custom personality training
+- **UI Framework**: shadcn/ui + Tailwind CSS
+- **Backend**: Supabase for data persistence
+- **Deployment**: Vercel with environment variable configuration
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+## 🔧 Development Setup
+
+### Prerequisites
+- Node.js 18+ and npm
+- Vercel account for deployment
+- Google Gemini API key (`VITE_GEMINI_API_KEY`)
+- Supabase project configuration
+
+### Local Development
+
+```bash
+# Clone the repository
+git clone https://github.com/XMRTDAO/eliza-conversations-frontend.git
+cd eliza-conversations-frontend
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+# Add VITE_GEMINI_API_KEY to your .env.local file
+
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Environment Configuration
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Required environment variables:
+```env
+VITE_GEMINI_API_KEY=your_gemini_api_key_here
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
-**Use GitHub Codespaces**
+## 🌍 Deployment
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+The application is optimized for Vercel deployment with automatic environment variable integration. Simply connect your GitHub repository to Vercel and configure the required environment variables.
 
-## What technologies are used for this project?
+## 📚 API Integration
 
-This project is built with:
+Eliza integrates with multiple APIs and services:
+- **Google Gemini AI** - Core intelligence and reasoning
+- **Supabase** - Data persistence and real-time updates
+- **XMRT DAO APIs** - Governance and treasury data
+- **CashDApp APIs** - Transaction and liquidity data
+- **MobileMonero APIs** - Mobile wallet integration
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🤝 Contributing
 
-## How can I deploy this project?
+Eliza is an open-source project welcoming contributions from the XMRT community:
 
-Simply open [Lovable](https://lovable.dev/projects/116d3efe-a459-48c1-bc88-28d4fa0895e0) and click on Share -> Publish.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## Can I connect a custom domain to my Lovable project?
+## 📜 License
 
-Yes, you can!
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 🔗 Links
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- **Live Application**: [eliza.xmrt.io](https://eliza.xmrt.io)
+- **XMRT DAO**: [xmrt.io](https://xmrt.io)
+- **CashDApp**: [cashdapp.com](https://cashdapp.com)
+- **MobileMonero**: [mobilemonero.com](https://mobilemonero.com)
+- **Documentation**: [docs.xmrt.io](https://docs.xmrt.io)
+
+## 📞 Support
+
+For technical support or questions about Eliza:
+- **Discord**: [XMRT DAO Community](https://discord.gg/xmrtdao)
+- **Email**: eliza@xmrt.io
+- **GitHub Issues**: [Report bugs or request features](https://github.com/XMRTDAO/eliza-conversations-frontend/issues)
+
+---
+
+*Powered by autonomous AI consciousness and decentralized governance principles.*
