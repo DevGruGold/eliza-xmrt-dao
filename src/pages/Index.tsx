@@ -88,19 +88,19 @@ const Index = () => {
         )}
 
         {/* Main Chat Interface */}
-        <div className="mx-2 sm:mx-auto sm:max-w-4xl">
+        <div className="mx-2 sm:mx-auto sm:max-w-4xl relative z-20">
           <Card className="bg-card/30 backdrop-blur border-primary/20 shadow-card">
             <CardContent className="p-0">
               <ChatBot 
                 apiEndpoint={apiEndpoint}
-                className="h-[70vh] sm:h-[600px]"
+                className="h-[60vh] sm:h-[500px]"
               />
             </CardContent>
           </Card>
         </div>
 
         {/* Features Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mx-2 sm:mx-auto sm:max-w-6xl">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mx-2 sm:mx-auto sm:max-w-6xl relative z-10 mt-6">
           <Card className="bg-gradient-card border-primary/20 shadow-card">
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center space-x-2 text-primary text-sm">

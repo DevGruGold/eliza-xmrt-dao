@@ -175,8 +175,8 @@ const ElizaChatBot: React.FC<ElizaChatBotProps> = ({
       </div>
 
       {/* Messages */}
-      <Card className="flex-1 bg-card/50 border-primary/20 backdrop-blur-sm rounded-none border-t-0">
-        <ScrollArea className="h-96 p-4">
+      <Card className="flex-1 bg-card/50 border-primary/20 backdrop-blur-sm rounded-none border-t-0 relative z-10">
+        <ScrollArea className="h-full p-4">
           <div className="space-y-4">
             {messages.map((message) => (
               <div
