@@ -2,8 +2,6 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Interfaces for Eliza API
 export interface ElizaConfig {
-  apiEndpoint?: string;
-  apiKey?: string;
   maxRetries?: number;
   timeout?: number;
   videoAvatarEnabled?: boolean;
@@ -255,29 +253,22 @@ Format your responses to be engaging and informative, often referencing specific
     try {
       this.avatarState.isGenerating = true;
       
-      // Generate initial neutral avatar video
-      const videoPrompt = `Create a professional AI assistant avatar: A sophisticated, approachable human-like figure with:
-      - Professional attire (modern business casual)
-      - Neutral, friendly expression
-      - Subtle head nods and blinks
-      - 30-second loop of natural idle movements
-      - Clean, minimalist background
-      - High quality, realistic rendering
-      Style: Photorealistic, professional, trustworthy`;
+      // Short prompt for minimal token usage
+      const videoPrompt = "Professional AI assistant, neutral expression, 10s loop";
 
-      // Simulate video generation (replace with actual Veo3 API call)
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Simulate quick generation
+      await new Promise(resolve => setTimeout(resolve, 800));
       
       this.avatarState = {
         isGenerating: false,
-        currentVideoUrl: '/api/generated-avatar/neutral.mp4', // This would be actual Veo3 output
+        currentVideoUrl: 'https://example.com/eliza-avatar.mp4', // Placeholder - would be Veo3 output
         emotion: 'neutral',
         isReady: true
       };
       
-      console.log('Eliza video avatar initialized successfully');
+      console.log('Eliza avatar ready');
     } catch (error) {
-      console.error('Failed to initialize video avatar:', error);
+      console.error('Avatar init failed:', error);
       this.avatarState.isGenerating = false;
     }
   }
@@ -301,8 +292,7 @@ Format your responses to be engaging and informative, often referencing specific
         neutral: 'Professional, calm expression, attentive posture, subtle movements'
       };
 
-      const videoPrompt = `Professional AI assistant expressing ${emotion}: ${emotionPrompts[emotion]}. 
-      Maintain professional appearance, 15-second expression sequence, smooth transitions.`;
+      const videoPrompt = `AI assistant ${emotion}: ${emotionPrompts[emotion]}, 8s`;
 
       // Simulate video generation
       await new Promise(resolve => setTimeout(resolve, 1500));
@@ -589,7 +579,6 @@ Format your responses to be engaging and informative, often referencing specific
 // Default configuration for local development
 export const createElizaService = (config?: Partial<ElizaConfig>): ElizaApiService => {
   const defaultConfig: ElizaConfig = {
-    apiEndpoint: 'http://localhost:8000', // Default XMRT-Ecosystem backend
     maxRetries: 3,
     timeout: 30000,
     videoAvatarEnabled: true, // Enable Veo3 video avatar by default
