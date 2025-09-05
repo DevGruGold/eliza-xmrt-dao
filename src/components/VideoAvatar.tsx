@@ -12,6 +12,12 @@ interface VideoAvatarProps {
     dao_activity: number;
     treasury_value: string;
     active_governance_proposals: number;
+    network_hashrate?: {
+      current_hashrate: string;
+      difficulty: string;
+      network_security: number;
+      mining_activity: string;
+    };
   };
   className?: string;
 }
@@ -121,35 +127,77 @@ const VideoAvatar: React.FC<VideoAvatarProps> = ({
             
             {/* Real-time metrics */}
             {realTimeData && (
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="space-y-1">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Ecosystem</span>
-                    <span className={getHealthColor(realTimeData.xmrt_ecosystem_health)}>
-                      {realTimeData.xmrt_ecosystem_health}%
-                    </span>
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="space-y-1">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Ecosystem</span>
+                      <span className={getHealthColor(realTimeData.xmrt_ecosystem_health)}>
+                        {realTimeData.xmrt_ecosystem_health}%
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Activity</span>
+                      <span className={getHealthColor(realTimeData.dao_activity)}>
+                        {realTimeData.dao_activity}%
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Activity</span>
-                    <span className={getHealthColor(realTimeData.dao_activity)}>
-                      {realTimeData.dao_activity}%
-                    </span>
+                  <div className="space-y-1">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Treasury</span>
+                      <span className="text-foreground font-medium">
+                        {realTimeData.treasury_value}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Proposals</span>
+                      <span className="text-accent font-medium">
+                        {realTimeData.active_governance_proposals}
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <div className="space-y-1">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Treasury</span>
-                    <span className="text-foreground font-medium">
-                      {realTimeData.treasury_value}
-                    </span>
+                
+                {/* Network Hashrate Section */}
+                {realTimeData.network_hashrate && (
+                  <div className="pt-2 border-t border-border/50">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Activity className="h-3 w-3 text-primary" />
+                      <span className="text-xs font-medium text-primary">Network Security</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="space-y-1">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Hashrate</span>
+                          <span className="text-foreground font-medium">
+                            {realTimeData.network_hashrate.current_hashrate}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Difficulty</span>
+                          <span className="text-foreground font-medium">
+                            {realTimeData.network_hashrate.difficulty}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Security</span>
+                          <span className={getHealthColor(realTimeData.network_hashrate.network_security)}>
+                            {realTimeData.network_hashrate.network_security}%
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Mining</span>
+                          <span className="text-accent font-medium">
+                            {realTimeData.network_hashrate.mining_activity}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Proposals</span>
-                    <span className="text-accent font-medium">
-                      {realTimeData.active_governance_proposals}
-                    </span>
-                  </div>
-                </div>
+                )}
               </div>
             )}
 
