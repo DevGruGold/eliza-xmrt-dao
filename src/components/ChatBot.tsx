@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
-import { Send, Bot, User, Brain, Zap, DollarSign, Activity, Wifi } from 'lucide-react';
+import { Send, Bot, User, Brain, Zap, DollarSign, Activity, Wifi, Trash2 } from 'lucide-react';
 import elizaAvatar from '@/assets/eliza-avatar.jpg';
 import ElizaApiService from './ElizaApiService';
 import VideoAvatar from './VideoAvatar';
@@ -73,6 +73,9 @@ const ElizaChatBot: React.FC<ElizaChatBotProps> = ({
       // Send message to Eliza service powered by Gemini AI
       const response = await elizaService.sendMessage({
         content: userMessage.content,
+        sender: 'user',
+        timestamp: new Date().toISOString(),
+        type: 'text',
         context: {
           timestamp: new Date().toISOString(),
           conversation_id: 'web-session-' + Date.now()
@@ -122,6 +125,26 @@ const ElizaChatBot: React.FC<ElizaChatBotProps> = ({
       sendMessage();
     }
   };
+
+  const clearConversation = async () => {
+    try {
+      await elizaService.clearConversation();
+      setMessages([]);
+      toast({
+        title: "Memory Cleared",
+        description: "Conversation history and memory have been reset.",
+      });
+    } catch (error) {
+      console.error('Failed to clear conversation:', error);
+      toast({
+        title: "Error",
+        description: "Failed to clear conversation memory.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const memoryInfo = elizaService.getConversationMemoryInfo();
 
   const TypingIndicator = () => (
     <div className="flex items-center space-x-2 p-3">
@@ -187,19 +210,36 @@ const ElizaChatBot: React.FC<ElizaChatBotProps> = ({
           </div>
           
           {/* Status indicators */}
-          <div className="flex items-center space-x-4 mt-3 text-xs">
-            <div className="flex items-center space-x-1">
-              <Brain className="h-3 w-3 text-primary" />
-              <span>{import.meta.env.VITE_GEMINI_API_KEY ? 'Gemini AI + Veo3' : 'Demo Mode'}</span>
+          <div className="flex items-center justify-between mt-3 text-xs">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-1">
+                <Brain className="h-3 w-3 text-primary" />
+                <span>{import.meta.env.VITE_GEMINI_API_KEY ? 'Gemini AI + Memory' : 'Demo Mode'}</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <Activity className="h-3 w-3 text-accent" />
+                <span>Live Monitoring</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <Wifi className="h-3 w-3 text-secondary" />
+                <span>XMRT Network</span>
+              </div>
+              {memoryInfo.totalInteractions > 0 && (
+                <div className="flex items-center space-x-1">
+                  <Brain className="h-3 w-3 text-primary" />
+                  <span>{memoryInfo.totalInteractions} memories</span>
+                </div>
+              )}
             </div>
-            <div className="flex items-center space-x-1">
-              <Activity className="h-3 w-3 text-accent" />
-              <span>Live Monitoring</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <Wifi className="h-3 w-3 text-secondary" />
-              <span>XMRT Network</span>
-            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearConversation}
+              className="text-xs p-1 h-6"
+              title="Clear conversation memory"
+            >
+              <Trash2 className="h-3 w-3" />
+            </Button>
           </div>
         </div>
 

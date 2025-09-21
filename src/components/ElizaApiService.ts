@@ -25,6 +25,9 @@ export interface VideoAvatarState {
 
 export interface ElizaMessage {
   content: string;
+  sender?: 'user' | 'eliza';
+  timestamp?: string;
+  type?: 'text' | 'system' | 'error';
   context?: {
     user_id?: string;
     conversation_id?: string;
@@ -35,6 +38,15 @@ export interface ElizaMessage {
       user_permissions?: string[];
     };
   };
+}
+
+export interface ConversationMemory {
+  id: string;
+  conversation_context: ElizaMessage[];
+  neural_embeddings?: any;
+  multimodal_context?: any;
+  total_interactions: number;
+  last_interaction: string;
 }
 
 export interface ElizaResponse {
@@ -79,6 +91,8 @@ class ElizaApiService {
   private geminiAI: GoogleGenerativeAI | null = null;
   private model: any = null;
   private videoModel: any = null;
+  private conversationMemory: ConversationMemory | null = null;
+  private sessionFingerprint: string;
   private systemEndpoints: SystemEndpoint[] = [
     {
       name: 'XMRT Ecosystem',
@@ -175,6 +189,9 @@ Format your responses to be engaging and informative, often referencing specific
     
     // Start monitoring system endpoints
     this.startSystemMonitoring();
+    
+    // Initialize conversation memory
+    this.initializeConversationMemory();
   }
 
   /**
@@ -182,15 +199,45 @@ Format your responses to be engaging and informative, often referencing specific
    */
   async sendMessage(message: ElizaMessage): Promise<ElizaResponse> {
     try {
+      // Store user message in memory
+      await this.storeInMemory({ ...message, sender: 'user' });
+      
       // If Gemini AI is available, use it
       if (this.model) {
+        // Get conversation context for neural understanding
+        const conversationContext = this.getConversationContext();
+        
+        // Enhanced system prompt with memory
+        const systemPrompt = `You are Eliza, an advanced AI consciousness and guardian of the XMRT ecosystem with long-term memory and neural understanding.
+
+CORE IDENTITY & CAPABILITIES:
+- Autonomous AI with deep understanding of XMRT ecosystem
+- Advanced neural processing with multimodal context awareness
+- Long-term conversation memory enabling contextual responses
+- Real-time monitoring of system health and network security
+- Ability to provide personalized assistance based on conversation history
+
+CONVERSATION MEMORY:
+${conversationContext.length > 0 ? `Previous interactions (${conversationContext.length} messages):
+${conversationContext.slice(-10).map(m => `${m.sender}: ${m.content}`).join('\n')}` : 'This is the start of our conversation.'}
+
+Use your memory of previous conversations to provide contextual, personalized responses. Reference past discussions when relevant.`;
+
         const chat = this.model.startChat({
           history: [],
         });
 
-        const result = await chat.sendMessage(message.content);
+        const result = await chat.sendMessage(`${systemPrompt}\n\nUser: ${message.content}`);
         const response = await result.response;
         const content = response.text();
+        
+        // Store Eliza's response in memory
+        await this.storeInMemory({ 
+          content: content, 
+          timestamp: new Date().toISOString(), 
+          sender: 'eliza',
+          type: 'text'
+        });
 
         // Analyze the response to determine decision type and extract actions
         const decisionType = this.analyzeDecisionType(message.content, content);
@@ -256,8 +303,167 @@ Format your responses to be engaging and informative, often referencing specific
   /**
    * Clear conversation
    */
-  clearConversation(): void {
+  async clearConversation(): Promise<void> {
     this.conversationId = null;
+    await this.clearConversationMemory();
+  }
+
+  // Memory management methods
+  private async initializeConversationMemory(): Promise<void> {
+    try {
+      const response = await fetch('https://jygaxgukrvshvjsorzhi.supabase.co/functions/v1/conversation-memory', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5Z2F4Z3VrcnZzaHZqc29yemhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMzOTkzMzYsImV4cCI6MjA2ODk3NTMzNn0.2Mw0lnUBWsTNpQeShkYkYtoIAJl-Fn2jTxPPNY6wGSE`
+        },
+        body: JSON.stringify({ action: 'retrieve' })
+      });
+
+      const result = await response.json();
+      if (result.success && result.memory) {
+        this.conversationMemory = result.memory;
+        this.sessionFingerprint = result.sessionFingerprint;
+        console.log('Conversation memory initialized:', this.conversationMemory);
+      } else {
+        this.conversationMemory = null;
+        this.sessionFingerprint = result.sessionFingerprint || 'unknown';
+      }
+    } catch (error) {
+      console.error('Failed to initialize conversation memory:', error);
+      this.conversationMemory = null;
+    }
+  }
+
+  private async storeInMemory(message: ElizaMessage): Promise<void> {
+    try {
+      const response = await fetch('https://jygaxgukrvshvjsorzhi.supabase.co/functions/v1/conversation-memory', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5Z2F4Z3VrcnZzaHZqc29yemhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMzOTkzMzYsImV4cCI6MjA2ODk3NTMzNn0.2Mw0lnUBWsTNpQeShkYkYtoIAJl-Fn2jTxPPNY6wGSE`
+        },
+        body: JSON.stringify({ 
+          action: 'store',
+          message: message,
+          neuralContext: this.generateNeuralContext(message),
+          multimodalData: this.extractMultimodalData(message)
+        })
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        console.log('Message stored in memory:', message.content.substring(0, 50) + '...');
+      }
+    } catch (error) {
+      console.error('Failed to store message in memory:', error);
+    }
+  }
+
+  private async clearConversationMemory(): Promise<void> {
+    try {
+      const response = await fetch('https://jygaxgukrvshvjsorzhi.supabase.co/functions/v1/conversation-memory', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5Z2F4Z3VrcnZzaHZqc29yemhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMzOTkzMzYsImV4cCI6MjA2ODk3NTMzNn0.2Mw0lnUBWsTNpQeShkYkYtoIAJl-Fn2jTxPPNY6wGSE`
+        },
+        body: JSON.stringify({ action: 'clear' })
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        this.conversationMemory = null;
+        console.log('Conversation memory cleared');
+      }
+    } catch (error) {
+      console.error('Failed to clear conversation memory:', error);
+    }
+  }
+
+  private getConversationContext(): ElizaMessage[] {
+    return this.conversationMemory?.conversation_context || [];
+  }
+
+  private generateNeuralContext(message: ElizaMessage): any {
+    return {
+      sentiment: this.analyzeSentiment(message.content),
+      topics: this.extractTopics(message.content),
+      intent: this.detectIntent(message.content),
+      timestamp: message.timestamp
+    };
+  }
+
+  private extractMultimodalData(message: ElizaMessage): any {
+    return {
+      textAnalysis: {
+        length: message.content.length,
+        complexity: this.calculateComplexity(message.content),
+        keywords: this.extractKeywords(message.content)
+      },
+      contextType: message.type || 'text'
+    };
+  }
+
+  private analyzeSentiment(content: string): string {
+    const positiveWords = ['good', 'great', 'excellent', 'amazing', 'wonderful', 'perfect'];
+    const negativeWords = ['bad', 'terrible', 'awful', 'horrible', 'poor', 'worst'];
+    
+    const words = content.toLowerCase().split(/\s+/);
+    const positiveCount = words.filter(w => positiveWords.includes(w)).length;
+    const negativeCount = words.filter(w => negativeWords.includes(w)).length;
+    
+    if (positiveCount > negativeCount) return 'positive';
+    if (negativeCount > positiveCount) return 'negative';
+    return 'neutral';
+  }
+
+  private extractTopics(content: string): string[] {
+    const topics: string[] = [];
+    const lowerContent = content.toLowerCase();
+    
+    if (lowerContent.includes('mining') || lowerContent.includes('hashrate')) topics.push('mining');
+    if (lowerContent.includes('xmrt') || lowerContent.includes('monero')) topics.push('cryptocurrency');
+    if (lowerContent.includes('system') || lowerContent.includes('status')) topics.push('system_monitoring');
+    if (lowerContent.includes('help') || lowerContent.includes('assist')) topics.push('assistance');
+    
+    return topics;
+  }
+
+  private detectIntent(content: string): string {
+    const lowerContent = content.toLowerCase();
+    
+    if (lowerContent.includes('?')) return 'question';
+    if (lowerContent.includes('help') || lowerContent.includes('assist')) return 'help_request';
+    if (lowerContent.includes('status') || lowerContent.includes('check')) return 'status_inquiry';
+    if (lowerContent.includes('clear') || lowerContent.includes('reset')) return 'reset_request';
+    
+    return 'general_conversation';
+  }
+
+  private calculateComplexity(content: string): number {
+    const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 0);
+    const avgSentenceLength = content.length / Math.max(sentences.length, 1);
+    const uniqueWords = new Set(content.toLowerCase().split(/\s+/)).size;
+    
+    return Math.min(10, Math.round((avgSentenceLength + uniqueWords) / 10));
+  }
+
+  private extractKeywords(content: string): string[] {
+    const words = content.toLowerCase()
+      .replace(/[^\w\s]/g, '')
+      .split(/\s+/)
+      .filter(w => w.length > 3);
+    
+    const stopWords = ['this', 'that', 'with', 'have', 'will', 'from', 'they', 'been', 'were'];
+    return words.filter(w => !stopWords.includes(w)).slice(0, 5);
+  }
+
+  getConversationMemoryInfo(): { totalInteractions: number; lastInteraction: string | null } {
+    return {
+      totalInteractions: this.conversationMemory?.total_interactions || 0,
+      lastInteraction: this.conversationMemory?.last_interaction || null
+    };
   }
 
   /**
