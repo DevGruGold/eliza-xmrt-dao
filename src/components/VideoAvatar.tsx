@@ -118,41 +118,41 @@ const VideoAvatar: React.FC<VideoAvatarProps> = ({
 
       {/* System Status Dashboard */}
       {(systemEndpoints.length > 0 || realTimeData) && (
-        <Card className="bg-card/50 border-primary/20 backdrop-blur-sm p-3">
-          <div className="space-y-3">
-            <h4 className="text-sm font-semibold text-primary flex items-center gap-2">
-              <Activity className="h-4 w-4" />
+        <Card className="bg-card/50 border-primary/20 backdrop-blur-sm p-3 overflow-hidden">
+          <div className="space-y-3 min-w-0">
+            <h4 className="text-sm font-semibold text-primary flex items-center gap-2 truncate">
+              <Activity className="h-4 w-4 flex-shrink-0" />
               System Status
             </h4>
             
             {/* Real-time metrics */}
             {realTimeData && (
               <div className="space-y-3">
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div className="space-y-1">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Ecosystem</span>
-                      <span className={getHealthColor(realTimeData.xmrt_ecosystem_health)}>
+                <div className="grid grid-cols-2 gap-2 text-xs min-w-0">
+                  <div className="space-y-1 min-w-0">
+                    <div className="flex justify-between items-center min-w-0">
+                      <span className="text-muted-foreground truncate">Ecosystem</span>
+                      <span className={`${getHealthColor(realTimeData.xmrt_ecosystem_health)} flex-shrink-0`}>
                         {realTimeData.xmrt_ecosystem_health}%
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Activity</span>
-                      <span className={getHealthColor(realTimeData.dao_activity)}>
+                    <div className="flex justify-between items-center min-w-0">
+                      <span className="text-muted-foreground truncate">Activity</span>
+                      <span className={`${getHealthColor(realTimeData.dao_activity)} flex-shrink-0`}>
                         {realTimeData.dao_activity}%
                       </span>
                     </div>
                   </div>
-                  <div className="space-y-1">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Treasury</span>
-                      <span className="text-foreground font-medium">
+                  <div className="space-y-1 min-w-0">
+                    <div className="flex justify-between items-center min-w-0">
+                      <span className="text-muted-foreground truncate">Treasury</span>
+                      <span className="text-foreground font-medium flex-shrink-0 truncate max-w-16">
                         {realTimeData.treasury_value}
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Proposals</span>
-                      <span className="text-accent font-medium">
+                    <div className="flex justify-between items-center min-w-0">
+                      <span className="text-muted-foreground truncate">Proposals</span>
+                      <span className="text-accent font-medium flex-shrink-0">
                         {realTimeData.active_governance_proposals}
                       </span>
                     </div>
@@ -166,31 +166,31 @@ const VideoAvatar: React.FC<VideoAvatarProps> = ({
                       <Activity className="h-3 w-3 text-primary" />
                       <span className="text-xs font-medium text-primary">Network Security</span>
                     </div>
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div className="space-y-1">
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Hashrate</span>
-                          <span className="text-foreground font-medium">
+                    <div className="grid grid-cols-2 gap-2 text-xs min-w-0">
+                      <div className="space-y-1 min-w-0">
+                        <div className="flex justify-between items-center min-w-0">
+                          <span className="text-muted-foreground truncate">Hashrate</span>
+                          <span className="text-foreground font-medium flex-shrink-0 truncate max-w-20">
                             {realTimeData.network_hashrate.current_hashrate}
                           </span>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Difficulty</span>
-                          <span className="text-foreground font-medium">
+                        <div className="flex justify-between items-center min-w-0">
+                          <span className="text-muted-foreground truncate">Difficulty</span>
+                          <span className="text-foreground font-medium flex-shrink-0 truncate max-w-20">
                             {realTimeData.network_hashrate.difficulty}
                           </span>
                         </div>
                       </div>
-                      <div className="space-y-1">
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Security</span>
-                          <span className={getHealthColor(realTimeData.network_hashrate.network_security)}>
+                      <div className="space-y-1 min-w-0">
+                        <div className="flex justify-between items-center min-w-0">
+                          <span className="text-muted-foreground truncate">Security</span>
+                          <span className={`${getHealthColor(realTimeData.network_hashrate.network_security)} flex-shrink-0`}>
                             {realTimeData.network_hashrate.network_security}%
                           </span>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Mining</span>
-                          <span className="text-accent font-medium">
+                        <div className="flex justify-between items-center min-w-0">
+                          <span className="text-muted-foreground truncate">Mining</span>
+                          <span className="text-accent font-medium flex-shrink-0 truncate max-w-16">
                             {realTimeData.network_hashrate.mining_activity}
                           </span>
                         </div>
@@ -203,20 +203,20 @@ const VideoAvatar: React.FC<VideoAvatarProps> = ({
 
             {/* Endpoint status */}
             {systemEndpoints.length > 0 && (
-              <div className="space-y-1">
+              <div className="space-y-1 min-w-0">
                 {systemEndpoints.map((endpoint, index) => (
-                  <div key={index} className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
+                  <div key={index} className="flex items-center justify-between text-xs min-w-0">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
                       {endpoint.status === 'online' ? (
-                        <Wifi className="h-3 w-3 text-accent" />
+                        <Wifi className="h-3 w-3 text-accent flex-shrink-0" />
                       ) : (
-                        <WifiOff className="h-3 w-3 text-destructive" />
+                        <WifiOff className="h-3 w-3 text-destructive flex-shrink-0" />
                       )}
-                      <span className="text-muted-foreground truncate max-w-20">
+                      <span className="text-muted-foreground truncate">
                         {endpoint.name}
                       </span>
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 flex-shrink-0">
                       <div className={`w-2 h-2 rounded-full ${getStatusColor(endpoint.status)}`} />
                       <span className="text-muted-foreground">
                         {endpoint.responseTime}ms

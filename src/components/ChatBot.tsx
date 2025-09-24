@@ -309,7 +309,7 @@ const ElizaChatBot: React.FC<ElizaChatBotProps> = ({
                   key={message.id}
                   className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} message-slide-in`}
                 >
-                  <div className={`flex items-start space-x-2 max-w-xs lg:max-w-md ${
+                  <div className={`flex items-start space-x-2 max-w-[280px] sm:max-w-sm lg:max-w-lg xl:max-w-xl ${
                     message.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''
                   }`}>
                     <Avatar className="h-8 w-8 ring-1 ring-border">
@@ -327,7 +327,7 @@ const ElizaChatBot: React.FC<ElizaChatBotProps> = ({
                       )}
                     </Avatar>
                     <div
-                      className={`px-4 py-2 rounded-lg shadow-card ${
+                      className={`px-4 py-2 rounded-lg shadow-card break-words overflow-hidden ${
                         message.sender === 'user'
                           ? 'bg-user-message text-foreground'
                           : message.type === 'system'
@@ -335,7 +335,7 @@ const ElizaChatBot: React.FC<ElizaChatBotProps> = ({
                           : 'bg-ai-message text-foreground border border-primary/20'
                       }`}
                     >
-                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
                       <span className="text-xs opacity-70 mt-1 block">
                         {message.timestamp.toLocaleTimeString()}
                       </span>

@@ -42,7 +42,8 @@ class TTSService {
 
       if (error) {
         console.error('TTS error:', error);
-        throw error;
+        // Return null instead of throwing to gracefully handle TTS failures
+        return null;
       }
 
       if (!data?.audioContent) {
