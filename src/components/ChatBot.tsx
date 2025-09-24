@@ -5,10 +5,12 @@ import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
-import { Send, Bot, User, Brain, Zap, DollarSign, Activity, Wifi, Trash2 } from 'lucide-react';
+import { Send, Bot, User, Brain, Zap, DollarSign, Activity, Wifi, Trash2, Volume2, VolumeX } from 'lucide-react';
 import elizaAvatar from '@/assets/eliza-avatar.jpg';
 import ElizaApiService from './ElizaApiService';
 import VideoAvatar from './VideoAvatar';
+import AudioPlayer from './AudioPlayer';
+import TTSService, { AVAILABLE_VOICES } from '@/services/TTSService';
 
 interface Message {
   id: string;
@@ -16,6 +18,8 @@ interface Message {
   sender: 'user' | 'eliza';
   timestamp: Date;
   type?: 'text' | 'action' | 'system';
+  audioContent?: string;
+  mimeType?: string;
 }
 
 interface ElizaChatBotProps {
@@ -39,8 +43,16 @@ const ElizaChatBot: React.FC<ElizaChatBotProps> = ({
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  // Initialize TTS service
+  const ttsService = useMemo(() => new TTSService({
+    voiceId: AVAILABLE_VOICES.Aria,
+    autoPlay: true,
+    enabled: audioEnabled
+  }), [audioEnabled]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -53,6 +65,11 @@ const ElizaChatBot: React.FC<ElizaChatBotProps> = ({
   const elizaService = useMemo(() => new ElizaApiService({ 
     videoAvatarEnabled: true 
   }), []);
+
+  // Update TTS service when audio enabled changes
+  useEffect(() => {
+    ttsService.setEnabled(audioEnabled);
+  }, [audioEnabled, ttsService]);
 
   const sendMessage = async () => {
     if (!inputValue.trim()) return;
@@ -82,6 +99,18 @@ const ElizaChatBot: React.FC<ElizaChatBotProps> = ({
         }
       });
 
+      // Generate TTS for Eliza's response if audio is enabled
+      let audioContent, mimeType;
+      if (audioEnabled) {
+        const ttsResponse = await ttsService.generateSpeech(response.content);
+        if (ttsResponse) {
+          audioContent = ttsResponse.audioContent;
+          mimeType = ttsResponse.mimeType;
+          // Auto-play the audio
+          ttsService.speakText(response.content);
+        }
+      }
+
       const elizaMessage: Message & {
         avatarState?: any;
         systemEndpoints?: any;
@@ -92,6 +121,8 @@ const ElizaChatBot: React.FC<ElizaChatBotProps> = ({
         sender: 'eliza',
         timestamp: new Date(),
         type: 'text',
+        audioContent,
+        mimeType,
         avatarState: response.avatar_state,
         systemEndpoints: response.system_endpoints,
         realTimeData: response.real_time_data
@@ -119,6 +150,16 @@ const ElizaChatBot: React.FC<ElizaChatBotProps> = ({
     }
   };
 
+  const toggleAudioEnabled = () => {
+    const newAudioEnabled = !audioEnabled;
+    setAudioEnabled(newAudioEnabled);
+    
+    toast({
+      title: newAudioEnabled ? "Audio Enabled" : "Audio Disabled",
+      description: newAudioEnabled ? "Eliza's responses will now be spoken" : "Audio responses are turned off",
+    });
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -129,6 +170,7 @@ const ElizaChatBot: React.FC<ElizaChatBotProps> = ({
   const clearConversation = async () => {
     try {
       await elizaService.clearConversation();
+      ttsService.clearQueue(); // Clear any pending audio
       setMessages([]);
       toast({
         title: "Memory Cleared",
@@ -231,15 +273,30 @@ const ElizaChatBot: React.FC<ElizaChatBotProps> = ({
                 </div>
               )}
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearConversation}
-              className="text-xs p-1 h-6"
-              title="Clear conversation memory"
-            >
-              <Trash2 className="h-3 w-3" />
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleAudioEnabled}
+                className="text-xs p-1 h-6"
+                title={audioEnabled ? "Disable audio responses" : "Enable audio responses"}
+              >
+                {audioEnabled ? (
+                  <Volume2 className="h-3 w-3 text-accent" />
+                ) : (
+                  <VolumeX className="h-3 w-3 text-muted-foreground" />
+                )}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearConversation}
+                className="text-xs p-1 h-6"
+                title="Clear conversation memory"
+              >
+                <Trash2 className="h-3 w-3" />
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -282,6 +339,18 @@ const ElizaChatBot: React.FC<ElizaChatBotProps> = ({
                       <span className="text-xs opacity-70 mt-1 block">
                         {message.timestamp.toLocaleTimeString()}
                       </span>
+                      
+                      {/* Audio player for Eliza messages with audio */}
+                      {message.sender === 'eliza' && message.audioContent && (
+                        <div className="mt-2">
+                          <AudioPlayer
+                            audioContent={message.audioContent}
+                            mimeType={message.mimeType}
+                            autoPlay={false}
+                            className="bg-transparent border-0 p-0"
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -312,7 +381,8 @@ const ElizaChatBot: React.FC<ElizaChatBotProps> = ({
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-2 text-center">
-            🎥 Powered by {import.meta.env.VITE_GEMINI_API_KEY ? 'Gemini AI + Veo3 Avatar' : 'XMRT Demo'} | Live XMRT Network Monitoring
+            🎥 Powered by {import.meta.env.VITE_GEMINI_API_KEY ? 'Gemini AI + Veo3 Avatar' : 'XMRT Demo'} | Live XMRT Network Monitoring | 
+            {audioEnabled && ' 🔊 ElevenLabs TTS'} Audio {audioEnabled ? 'Enabled' : 'Disabled'}
           </p>
         </div>
       </div>

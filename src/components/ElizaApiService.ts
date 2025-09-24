@@ -95,8 +95,15 @@ class ElizaApiService {
   private sessionFingerprint: string;
   private systemEndpoints: SystemEndpoint[] = [
     {
-      name: 'XMRT Ecosystem',
-      url: 'https://xmrt-ecosystem-0k8i.onrender.com/',
+      name: 'XMRT Testing',
+      url: 'https://xmrt-testing.onrender.com/',
+      status: 'online',
+      lastChecked: new Date(),
+      responseTime: 0
+    },
+    {
+      name: 'XMRT DAO Vercel',
+      url: 'https://xmrtdao.vercel.app/',
       status: 'online',
       lastChecked: new Date(),
       responseTime: 0
@@ -111,13 +118,6 @@ class ElizaApiService {
     {
       name: 'XMRT DAO Dashboard',
       url: 'https://xmrtdao.streamlit.app',
-      status: 'online',
-      lastChecked: new Date(),
-      responseTime: 0
-    },
-    {
-      name: 'XMRT Ecosystem E3BM',
-      url: 'https://xmrt-ecosystem-e3bm.onrender.com/',
       status: 'online',
       lastChecked: new Date(),
       responseTime: 0
@@ -168,11 +168,10 @@ Your personality:
 Always respond as Eliza, maintaining your identity as the XMRT-Ecosystem's autonomous AI assistant. Provide actionable insights and recommendations when possible. You have the ability to make autonomous decisions for the DAO when appropriate.
 
 You have access to real-time data from:
-- https://xmrt-ecosystem-0k8i.onrender.com/ (Main ecosystem backend)
+- https://xmrt-testing.onrender.com/ (Main XMRT ecosystem frontend)
+- https://xmrtdao.vercel.app/ (Live network hashrate and XMRT DAO dashboard)
 - https://xmrtnet-eliza.onrender.com/ (Network monitoring)  
-- https://xmrtdao.streamlit.app (DAO dashboard)
-- https://xmrt-ecosystem-e3bm.onrender.com/ (Extended ecosystem services)
-- https://xmrtdao.vercel.app (Live network hashrate and mining data)
+- https://xmrtdao.streamlit.app (DAO dashboard analytics)
 
 Format your responses to be engaging and informative, often referencing specific data points, confidence scores, and recommended actions as if you're actively monitoring the ecosystem.`
       });
